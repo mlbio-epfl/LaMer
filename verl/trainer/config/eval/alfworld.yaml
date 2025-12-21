@@ -1,0 +1,130 @@
+checkpoint_path: checkpoints/alfworld/alfworld_gigpo_qwen3_4b_non_thinking_attempt1 #checkpoints/sokoban/sokoban_gigpo_qwen3_4b_non_thinking_attempt1_group12
+n_rounds: 4
+suffix: ""
+
+trainer:
+  nnodes: 1
+  n_gpus_per_node: 4
+
+data:
+  path: /home/runai-home/data/verl-agent/text/test.parquet
+  prompt_key: prompt
+  n_samples: 5
+  output_path: outputs
+  train_batch_size: 1
+  val_batch_size: 128
+  trust_remote_code: False  # main_ppo will check this config to determine whether to use remote code for tokenizer
+  custom_cls:
+      path: null
+      name: null
+  # others
+  use_shm: False
+  reward_fn_key: data_source
+  max_prompt_length: 8192
+  max_response_length: 1024
+  return_raw_input_ids: False  # This should be set to true when the tokenizer between policy and rm differs
+  return_raw_chat: True
+  return_full_prompt: False
+  shuffle: True
+  filter_overlong_prompts: False # for large-scale dataset, filtering overlong prompts could be timeconsuming. You cat set the filter_overlong_prompts_workers to use multiprocessing to speed up.
+  filter_overlong_prompts_workers: 1
+  truncation: error
+  image_key: images
+  video_key: videos
+  
+model:
+  path: Qwen/Qwen3-4B
+  external_lib: null
+rollout:
+  name: vllm
+  mode: sync # sync: LLM, async: AsyncLLM
+  temperature: 1.0
+  top_k: 50 # 0 for hf rollout, -1 for vllm rollout
+  top_p: 0.7
+  prompt_length: 4096
+  response_length: 4096
+  repetition_penalty: 1.05
+  # for vllm rollout
+  dtype: bfloat16 # should align with FSDP
+  gpu_memory_utilization: 0.8
+  ignore_eos: False
+  enforce_eager: False
+  free_cache_engine: False
+  load_format: dummy_dtensor
+  tensor_model_parallel_size: 2
+  max_num_batched_tokens: 16384
+  max_model_len: null
+  max_num_seqs: 1024
+  log_prob_micro_batch_size: null # will be deprecated, use log_prob_micro_batch_size_per_gpu
+  log_prob_micro_batch_size_per_gpu: 8
+  # for fire vllm rollout
+  use_fire_sampling: False # enable FIRE https://arxiv.org/abs/2410.21236
+  # for hf rollout
+  do_sample: True
+  disable_log_stats: True
+  enable_chunked_prefill: True
+  n: 1
+
+  val_kwargs:
+    # sampling parameters for validation
+    top_k: 20 # 0 for hf rollout, -1 for vllm rollout
+    top_p: 0.8
+    temperature: 0.7
+    n: 1
+    do_sample: True # default eager for validation
+    seed: 20
+    repetition_penalty: 1.05
+
+    # temperature: 1.0
+    # top_k: 50 # 0 for hf rollout, -1 for vllm rollout
+    # top_p: 0.7
+    
+  multi_turn:
+    enable: False  # set to True for multi-turn tool interaction tasks; should set rollout.name to sglang as well
+    max_turns: null  # null for no limit (default max_length // 3)
+    tool_config_path: null  # null for no tool
+    format: chatml  # chatml, more formats will be supported in the future
+
+actor:
+  strategy: fsdp  # This is for backward-compatibility
+  ulysses_sequence_parallel_size: 1 # sp size
+  fsdp_config:
+    fsdp_size: -1
+
+ray_init:
+  num_cpus: null # `None` means using all CPUs, which might cause hang if limited in systems like SLURM. Please set to a number allowed then.
+
+
+algorithm:
+  gamma: 1.0
+  lam: 1.0
+  adv_estimator: gae
+  norm_adv_by_std_in_grpo: True
+  use_kl_in_reward: False
+  kl_penalty: kl  # how to estimate kl divergence
+  kl_ctrl:
+    type: fixed
+    kl_coef: 0.001
+    horizon: 10000
+    target_kl: 0.1
+  use_pf_ppo: False
+  pf_ppo:
+    reweight_method: pow  # ["pow", "max_min", "max_random"]
+    weight_pow: 2.0
+  gigpo:
+    step_advantage_w: 1.0
+    mode: "mean_norm" # "mean_norm" or "mean_std_norm"
+  filter_groups: # DAPO from https://arxiv.org/abs/2503.14476
+    enable: False
+    max_num_gen_batches: 10
+
+env:
+  env_name: alfworld/AlfredTWEnv
+  seed: 0
+  max_steps: 48
+  num_attempts: 3
+  max_turns: 30
+  rollout:
+    n: 1
+  alfworld:
+    eval_dataset: eval_all # eval_in_distribution
