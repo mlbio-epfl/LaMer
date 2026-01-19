@@ -1,4 +1,4 @@
-checkpoint_path: checkpoints/minesweeper/minesweeper_gigpo_qwen3_4b_non_thinking_attempt3_traj06
+checkpoint_path: null
 n_rounds: 4
 suffix: ""
 

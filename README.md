@@ -31,6 +31,10 @@ See the `examples` folder for more examples.
 </div>
 </br>
 
+## Environment
+Please follow this [note](https://github.com/mlbio-epfl/LaMer/tree/main/assets/env.md) to install and test the agent environments.
+
+
 ## Acknowledgements
 This work is built upon [verl](https://github.com/volcengine/verl), [verl-agent](https://github.com/langfengQ/verl-agent), [reflexion](https://github.com/noahshinn/reflexion), [RAGEN](https://github.com/mll-lab-nu/RAGEN). We thank the authors and contributors of these projects for sharing their valuable work.
 

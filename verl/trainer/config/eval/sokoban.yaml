@@ -1,4 +1,4 @@
-checkpoint_path: null # checkpoints/sokoban/sokoban_gigpo_qwen3_4b_non_thinking_attempt1
+checkpoint_path: null 
 n_rounds: 4
 suffix: ""
 
