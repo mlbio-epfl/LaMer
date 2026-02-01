@@ -6,7 +6,7 @@
 
 --------------
 
-This repo contains the source code of 🌊LaMer, a Meta-RL framework of training LLM agents to actively explore and adapt to the environment at test time.
+This repo contains the source code of 🌊LaMer, a Meta-RL framework of training LLM agents to actively explore and adapt to the environment at test time (ICLR '26).
 
 </br>
 <div align="left" style="padding: 0 0pt">
@@ -43,11 +43,11 @@ This work is built upon [verl](https://github.com/volcengine/verl), [verl-agent]
 If you find our code useful, please consider citing:
 
 ```
-@article{jiang2025metarl,
+@inproceedings{jiang2026metarl,
     title={Meta-RL Induces Exploration in Language Agents},
     author={Yulun Jiang and Liangze Jiang and Damien Teney and Michael Moor and Maria Brbic},
-    journal={arXiv preprint arXiv:2512.16848}
-    year={2025}
+    booktitle={International Conference on Learning Representations}
+    year={2026}
 }
 ```
 
